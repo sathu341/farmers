@@ -1,0 +1,135 @@
+{% extends 'home.html' %}
+{% load static %}
+{% block title %} Cart {% endblock %}
+
+{% block content %}
+
+<br/><br/><br/><br/>
+
+<style>
+  table {
+    width: 100%;
+    padding: 10px;
+  }
+  table th {
+    text-align: center;
+    padding: 10px;
+    height: 50px;
+    border: 2px solid rgb(22, 16, 16);
+  }
+  table tr {
+    text-align: center;
+    border: 1px solid lightgrey;
+    background-color: rgb(0, 2, 1);
+    color: white;
+  }
+  table tr td {
+    padding: 20px;
+    border: 1px solid lightgrey;
+    background-color: rgb(26, 28, 21);
+  }
+  .icons {
+    color: red;
+  }
+  .quantity-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .quantity-controls button {
+    background: #28a745;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 50%;
+  }
+  .quantity-controls input {
+    width: 50px;
+    text-align: center;
+    font-size: 18px;
+    border: none;
+    background-color: transparent;
+    color: rgb(156, 151, 151);
+    margin:5px;
+    border-radius:25%;
+    text-align: center;
+  }
+</style>
+{% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+<table>
+  <tr>
+    <th>Product Name</th>
+    <th>Quantity</th>
+    <th>Total Price</th>
+    <th>Remove</th>
+  </tr>
+
+  {% for item in cart_items %}
+  <tr>
+    <td>{{ item.product.pname }}</td>
+    <td>
+      <div class="quantity-controls">
+        <button class="decrease-btn" data-id="{{ item.id }}">-</button>
+        <input type="text" class="quantity" data-id="{{ item.id }}" value="{{ item.quantity }}" min="1">
+        <button class="increase-btn" data-id="{{ item.id }}">+</button>
+      </div>
+    </td>
+    <td>₹{{ item.total_price }}</td>
+    <td>
+      <a href="{% url 'remove_from_cart' item.id %}" style="color:red;">
+
+        <i class="fa-solid fa-trash-can icons"></i>
+      </a>
+    </td>
+  </tr>
+  {% endfor %}
+
+  <tr>
+    <td colspan="3" align="right">Total</td>
+    <td>₹{{ total_price }}</td>
+  </tr>
+</table>
+<a href="/order/place/">Confirm Order</a>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".increase-btn").forEach(button => {
+      button.addEventListener("click", function() {
+        let itemId = this.getAttribute("data-id");
+        updateQuantity(itemId, "increase");
+      });
+    });
+
+    document.querySelectorAll(".decrease-btn").forEach(button => {
+      button.addEventListener("click", function() {
+        let itemId = this.getAttribute("data-id");
+        updateQuantity(itemId, "decrease");
+      });
+    });
+
+    function updateQuantity(itemId, action) {
+      fetch(`/update-cart/${itemId}/${action}/`, {
+        method: "GET"
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log(data.new_quantity)
+          location.reload()
+        }
+      });
+    }
+  });
+</script>
+
+{% endblock %}

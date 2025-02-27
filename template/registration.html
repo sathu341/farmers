@@ -1,0 +1,108 @@
+<body >
+{% extends 'base.html' %} 
+{% load static %}
+   {% block content %}
+   
+       
+   
+   <br><br><br>
+   <section class="section">
+    <div class="container">
+       
+        <div class="row">
+            
+            <div class="col-lg-6">
+                <h1>Login Here!</h1>
+                <form action="/login" method="post">
+                    {% csrf_token %}
+                   
+                           <br>
+                        <div class="form-floating">
+                           
+                            <input type="text" name="eml" class="form-control" id="user1"  placeholder="Enter email id" required>
+                            <label for="user1">Email id</label>
+                          </div>
+                          <br>
+                          <div class="form-floating">
+                            <input type="password"  name="passw" class="form-control" id="floatingPassword" placeholder="Password" required>
+                            <label for="floatingPassword">Password</label>
+                          </div>
+                          <br>
+                          <button type="submit" class="btn btn-outline-dark">login</button>
+                    
+                        </form>
+
+            </div>
+     
+            
+            <div class="col-lg-6">
+
+                <form action="/registration" method="post">
+                    {% csrf_token %}
+                <h1 style="text-align: center;">REGISTRATION FORM</h1>
+   
+        
+                <table class="table table-striped table-dark">
+                    <tr>
+                        <td>
+                            <label for="dname" class="patient_name" >Name</label>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="name" placeholder="enter name here" id="dname" required>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <label for="emal" class="email_id">Email</label>
+                        </td>
+                        <td>
+                            <input type="email"  class="form-control"  name="email" placeholder="eg:xyz@gmail.com" id="emal" required>
+                        </td>
+                    </tr>
+                    <tr class="form-floating">
+                        <td>
+                            <label for="floatingpassword">Password</label>
+                        </td>
+                        <td>
+                            <input class="form-control"  type="password" id="floatingpassword" name="password" placeholder="Password"  >
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="cnumber" class="contact_number"> Contact number</label>
+                            
+                        </td>
+                        <td>
+                            <input  class="form-control" type="tel" name="contact_number" placeholder="enter number here" id="cnumber" required>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="cnumber" class="contact_number"> Aadhar number</label>
+                            
+                        </td>
+                        <td>
+                            <input  class="form-control" type="tel" name="adnum" placeholder="enter number here" id="cnumber" required>
+                        </td>
+                    </tr>
+                   
+                    
+                    
+                    
+                </table>
+                   <div style=" height: 200px;position: relative;">
+                <button type="submit" class="btn btn-primary"  style="position: border-radius: 5px; background-color: rgb(122, 122, 233);color: rgb(236, 236, 245);  " >Register</button>
+                    </div>
+                </form>
+
+            </div>
+
+        </div><!--/row-->
+
+    </div><!--/container-->
+</section>
+
+   
+{% endblock %}
+</body>

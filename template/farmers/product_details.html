@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>product Detail</title>
+   
+</head>
+<body>
+    <style>
+        .wrp{
+            width:auto;
+            display:flex;
+            gap:10px;
+        }
+        .left{
+            width:20%;
+            display:flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap:10px;
+        }
+        .left img{
+            border:1px solid lightgrey;
+            margin:3px;
+        }
+        .right{
+            width:70%;
+            display:flex;
+            gap:10px;
+        }
+        .col1{
+            width:50%;
+            border-right: 1px solid lightgrey; 
+            padding:10px;
+        }
+        .col2{
+            width:50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: left;
+            padding:20px;
+        }
+        .row1{
+            width:auto;
+            height: 200px;
+            padding:20px;
+            margin:10px;
+            display:flex;
+            gap:20px;
+            justify-content: right;
+        }
+
+    </style>
+    <div class="wrp">
+        <div class="left">
+            <img class="thumbnail" src="{{ products.image.url }}" style="width:100px;height:60px;"/>
+            <img class="thumbnail" src="{{ products.image2.url }}" style="width:100px;height:60px;"/>
+            <img  class="thumbnail" src="{{ products.image3.url }}" style="width:100px;height:60px;"/>
+            <img  class="thumbnail" src="{{ products.image4.url }}" style="width:100px;height:60px;"/>
+
+
+
+
+        </div>
+        <div class="right">
+            <div class="col1">
+                <img id="img" src="{{ products.image.url }}" style="width:100%;height:250px;"/>
+            </div>
+            <div class="col2">
+                <h2>Name:{{ products.name}} </h2>
+               
+                 <h4> Category {{ products.cat }}</h4>
+                <p>Description: {{ products.description}}</p>
+                <h3>price:{{products.price}}</h3>
+                <h3></h3>
+
+                
+            </div>
+           
+        </div>
+       
+    </div>
+
+    <div class="row1">
+        <a href="">Buy Now</a> |  <a href="/add_to_cart/{{products.id}}/">Add to Cart</a>
+    </div>
+    <script>
+        window.addEventListener("DOMContentLoaded",()=>{
+            let img1=document.querySelector("#img1");
+            let thumbnail=document.querySelectorAll(".thumbnail")
+           thumbnail.forEach(thumbnail =>{
+            thumbnail.addEventListener("mouseover",()=>{
+                let imageSrc = thumbnail.getAttribute("src");
+                img.setAttribute("src", imageSrc);
+            })
+           })
+          
+        })
+    </script>
+</body>
+</html>
