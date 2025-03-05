@@ -1,4 +1,5 @@
-{% extends 'home.html' %}
+{% extends base %}
+
 {% load static %}
 {% block title %} Cart {% endblock %}
 
@@ -67,6 +68,7 @@
         {% endfor %}
     </div>
 {% endif %}
+
 <table>
   <tr>
     <th>Product Name</th>

@@ -5,14 +5,15 @@
 <style>
 
 .about {
-      background-image: url("{% static 'images/city.png' %}");
-     
+      /* background-image: url("{% static 'images/city.png' %}"); */
+    background: linear-gradient(to left, #0a951d, #098684); 
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    color:white;
-    height: 400px;
+    color:rgb(17, 219, 91);
+    height:auto;
+    padding:25px;
 }
 
 
@@ -31,14 +32,6 @@
     </div>
   </div>
 
-
-
-
-
-
-
-
-
 <div class="container-fluid">
     
     <div class="row">
@@ -47,16 +40,7 @@
        </div>
        
     </div>
-    <br>
-    <div class="row justify-content-center">
-        <div class="col-lg-12 p-4 about">
-            <h1 id="ab" class="text-center"> About us</h1>
-            <p style="text-align: justify; text-justify: inter-word;" >
-              Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum
-
-            </p>
-        </div>
-    </div>
+   
   <br>
   <hr/>
 <style>
@@ -66,32 +50,35 @@
         display: flex;
         flex-wrap: wrap;
         gap:10px;
+        justify-content: center;
 
     }
     .items{
-        width:35%;
+        width:30%;
         display:flex;
         flex-direction: column;
         gap:10px;
         justify-content: center;
         align-items: center;
         padding:10px;
-        border: 1px solid lightgray;
+        height: 450px;
+        background: linear-gradient(to right, #2ed46e, #d4deef); 
+        /* border: 1px solid lightgray; */
     }
     .items  img{
         width:100%;
-        height:150px;
+        height:250px;
     }
     .items a{
         padding:10px;
         border-radius: 20px;
-        background-color: blueviolet;
+        background-color: rgb(53, 218, 146);
         text-decoration: none;
         text-align: center;
         color:white;
     }
     .items .p{
-        border: 1px solid lightgray;
+        /* border: 1px solid lightgray; */
   
         width:100%;
         display:flex;
@@ -99,6 +86,7 @@
         flex-direction: column;
         align-items: center;
         padding:20px;
+        height:186px;
     }
     @media (max-width:600px){
       .warper{
@@ -118,7 +106,7 @@
         justify-content: center;
         align-items: center;
         padding:10px;
-        border: 1px solid lightgray;
+        /* border: 1px solid lightgray; */
     }
     }
 </style>
@@ -129,10 +117,11 @@
     <div class="items">
       <img src="{{ product.image.url }}" />
       <div class="p">
-      <h3>{{product.pname}}</h3>
-      <h3>&#8377; {{product.price}}</h3>
-      <a href="/login">Add to Cart</a>
+      <strong>{{product.pname}}</strong>
+      <strong>&#8377; {{product.price}}</strong>
+      
       </div>
+      <a href="/shoplogin">Add to Cart</a>
     </div>
     {% endfor %}
 </div>
@@ -141,5 +130,15 @@
 
 </div>
 
+<br>
+<div class="row justify-content-center" id="about">
+    <div class="col-lg-12 p-4 about">
+        <h1 id="ab" class="text-center"> About us</h1>
+        <p style="text-align: justify; text-justify: inter-word;" >
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum
+
+        </p>
+    </div>
+</div>
 
 {% endblock %}

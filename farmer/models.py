@@ -23,7 +23,8 @@ class shop(models.Model):
     email=models.CharField(max_length=100)    
     passw=models.CharField(max_length=100)    
     location=models.CharField(max_length=100)    
-    contact=models.CharField(max_length=100)     
+    contact=models.CharField(max_length=100)  
+    role=models.CharField(max_length=100,default='farmer')   
     def __str__(self):
         return self.shname
 class Shopproduct(models.Model):
@@ -56,13 +57,13 @@ class Product(models.Model):
     image3 = models.ImageField(upload_to="frproducts/")
     image4 = models.ImageField(upload_to="frproducts/")
     stock = models.PositiveIntegerField()
-    farmer = models.ForeignKey(Farm_table, on_delete=models.CASCADE)  # Farmer who added the product
+    farmer = models.ForeignKey(shop, on_delete=models.CASCADE)  # Farmer who added the product
 
     def __str__(self):
         return self.name
 
 class NewCart(models.Model):
-    user=models.ForeignKey(Farm_table,on_delete=models.CASCADE)
+    user=models.ForeignKey(shop,on_delete=models.CASCADE)
     product=models.ForeignKey(Shopproduct,on_delete=models.CASCADE)
     quantity=models.PositiveIntegerField(default=1)
     def total_price(self):
@@ -71,13 +72,21 @@ class NewCart(models.Model):
     
 # Cart Model
 class Cart(models.Model):
-    user = models.ForeignKey(Farm_table, on_delete=models.CASCADE,related_name="cart_user")
-    product = models.ForeignKey(Shopproduct, on_delete=models.CASCADE,related_name="cart_product")
+    user = models.ForeignKey(shop, on_delete=models.CASCADE,related_name="cart_user")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,related_name="cart_product")
     quantity = models.PositiveIntegerField(default=1)
 
     def total_price(self):
         print(int(self.quantity) * 1234)
         return( Decimal(self.product.price) * Decimal(self.quantity))
+class FarmerCart(models.Model):
+    user = models.ForeignKey(shop, on_delete=models.CASCADE,related_name="cart_farmer")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,related_name="cart_farmer")
+    quantity = models.PositiveIntegerField(default=1)
+
+    def total_price(self):
+        print(int(self.quantity) * 1234)
+        return( Decimal(self.product.price) * Decimal(self.quantity))    
 
 # Order Model
 class Order(models.Model):
@@ -87,7 +96,7 @@ class Order(models.Model):
         ('Shipped', 'Shipped'),
         ('Delivered', 'Delivered'),
     ]
-    user = models.ForeignKey(Farm_table, on_delete=models.CASCADE)
+    user = models.ForeignKey(shop, on_delete=models.CASCADE)
     cart_items = models.ManyToManyField(NewCart)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
@@ -114,7 +123,7 @@ class Payment(models.Model):
     ]
     
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    user = models.ForeignKey(Farm_table, on_delete=models.CASCADE)
+    user = models.ForeignKey(shop, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     method = models.CharField(max_length=20, choices=PAYMENT_METHODS)
     transaction_id = models.CharField(max_length=100, unique=True, null=True, blank=True)

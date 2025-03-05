@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import uuid 
 import numpy as np
-from . models import Farm_table,Prediction,shop,Shopproduct,Cart,NewCart,Payment,Delivery
+from . models import Farm_table,Prediction,shop,Shopproduct,Cart,NewCart,Payment,Delivery,FarmerCart
 from django.contrib.sessions.models import Session
 import uvicorn
 import numpy as np
@@ -128,7 +128,7 @@ def prediction(request):
         # print(name.index("."))
         # print(name[name.index("."):len(name)])
 
-        model=load_model("D:\potato_farm\potatoes.h5")
+        model=load_model("C:/collegeproject/potato_farm/potatoes.h5")
         # test_image=image.load_img('D:\potato_farm/testimage/'+str(filename),target_size=(150,150))
         # text_image=image.load_img(str(lc),target_size=(150,150))
         # if text_image.shape[2] == 4: 
@@ -289,7 +289,7 @@ def farmersaddProduct(request):
         image4=request.FILES.get('image4')
         stock=request.POST.get('stock')
         description=request.POST.get('description')
-        farmers=get_object_or_404(Farm_table,id=request.session.get('didno'))
+        farmers=get_object_or_404(shop,id=request.session.get('didno'))
         Product.objects.create(
             name=pname,
             cat=cat, 
@@ -351,12 +351,14 @@ def shopregister(req):
         password=req.POST.get('password')
         location=req.POST.get('location')
         contact=req.POST.get('contact')
+        role=req.POST.get('role')
         check=shop.objects.filter(email=email).first()
         if check:
              return render(req,'shop/shopregister.html',{'msg':'email already existing'})
         
         result=shop.objects.create(
-            shname=shopname,email=email,passw=password,location=location,contact=contact
+            shname=shopname,email=email,passw=password,location=location,contact=contact,
+            role=role
         )
         if result:
             return render(req,'shop/login.html',{'msg':'register success login here'})
@@ -369,20 +371,42 @@ def shoplogin(req):
         email=req.POST.get('email')
         password=req.POST.get('password')
         result=shop.objects.filter(email=email,passw=password).first()
-        if result:
+        if result.role=="shopowner":
             req.session['shopid']=result.id
+            req.session['didno']=result.id
+            req.session['role']=result.role
             
             return redirect('shophome')
+        elif result.role=="farmer":
+            req.session['didno']=result.id
+            req.session['shopid']=result.id
+            req.session['role']=result.role
+            return redirect('/home')
     return render(req,'shop/login.html',{'msg':''})
 #shoppage 
 def shophome(req):
-    shop=req.session.get('shop')
-    return render(req,'shopbase.html',{'shop':shop})
+    shop=req.session.get('didno')
+    products=Shopproduct.objects.order_by('-id').filter(cat="Equiment")
+    farmer=Shopproduct.objects.order_by('-id').filter(cat="Product")
+    return render(req,'shopbase.html',{'shop':shop,'Equiment':products,'products':farmer})
 
 # Show all products
 def product_list(request):
-    products = Shopproduct.objects.all()
-    return render(request, "shop/product_list.html", {"products": products})
+    user=get_object_or_404(shop,id=request.session.get('didno'))
+    if user.role=="farmer":
+        base='home.html'
+    else:
+        base='shopbase.html'
+    products = Shopproduct.objects.order_by('-id').filter(cat="Equiment",shop=user)
+    return render(request, "shop/product_list.html", {"products": products,'base':base})
+def product_list_all(request):
+    user=get_object_or_404(shop,id=request.session.get('didno'))
+    if user.role=="farmer":
+        base='home.html'
+    else:
+        base='shopbase.html'
+    products = Shopproduct.objects.order_by('-id').filter(cat="Equiment")
+    return render(request, "shop/product_list.html", {"products": products,'base':base})
 def product_byid(req,prdid):
     products=get_object_or_404(Shopproduct,id=prdid)
     return render(req,'shop/product_details.html',{'products':products})
@@ -392,40 +416,77 @@ def add_to_cart(request, product_id):
     
     # Debug session value
     didno = request.session.get('didno')
+    users=get_object_or_404(shop,id=didno)
     if not didno:
         return HttpResponse("User session ID missing", status=400)
 
     print("Session ID (didno):", didno)
-    
     products = get_object_or_404(Shopproduct, id=product_id)
 
-    # Ensure the user exists
+    
+   
     try:
-        users = Farm_table.objects.get(id=didno)
-        print("user",users.id)
-        print(users.nam)
-    except Farm_table.DoesNotExist:
+            # users = shop.objects.get(id=didno)
+            print("user",users.id)
+            print(users.shname)
+            cart=NewCart.objects.create(
+            user=users,product=products
+        )
+            if cart:
+                print("add to cart")
+    except shop.DoesNotExist:
         return HttpResponse("User does not exist", status=400)
 
-    # Create cart entry
-    NewCart.objects.create(
-        user=users,product=products
-    )
+
    
     return redirect("cart")
         
 
+def farmeradd_to_cart(request, product_id):
+     # Debug session value
+    didno = request.session.get('didno')
+    user=get_object_or_404(shop,id=didno)
+    if not didno:
+        return HttpResponse("User session ID missing", status=400)
+    products=get_object_or_404(Product,id=product_id)
+    try:
+            users = shop.objects.get(id=didno)
+            print("user",users.id)
+            print(users.shname)
+            FarmerCart.objects.create(
+                user=users,product=products
+            )
+    except Farm_table.DoesNotExist:
+            return HttpResponse("User does not exist", status=400)
+
+        # Create cart entry
+         
+    # Ensure the user exists
     
+   
+    return redirect("cart")
+    
+
     
 
 # View cart
 
 def cart_view(request):
-    user=get_object_or_404(Farm_table,id=request.session.get('didno'))
+   
+    user=get_object_or_404(shop,id=request.session.get('didno'))
+    if user.role=="farmer":
+        base="home.html"
+    else:
+        base="shopbase.html"   
+    
     cart_items = NewCart.objects.filter(user=user)
     total_price=sum(float(item.total_price()) for item in cart_items)
     print(total_price)
-    return render(request, "shop/cart.html", {"cart_items": cart_items, "total_price": total_price})
+    print(user.role)
+ 
+    return render(request, "shop/cart.html", {"cart_items": cart_items, "total_price": total_price,'base':base})
+    
+    
 
 # Remove from cart
 
@@ -438,7 +499,7 @@ def remove_from_cart(request, cart_id):
 # Place Order
 
 def place_order(request):
-    users = get_object_or_404(Farm_table, id=request.session.get('didno'))  # Ensure Farm_table user exists
+    users = get_object_or_404(shop, id=request.session.get('didno'))  # Ensure Farm_table user exists
 
     cart_items = NewCart.objects.filter(user=users)
     
@@ -481,9 +542,13 @@ def update_cart_quantity(request, item_id, action):
 # View all orders
 
 def order_list(request):
-    users = get_object_or_404(Farm_table, id=request.session.get('didno'))
+    users = get_object_or_404(shop, id=request.session.get('didno'))
+    if users.role=="farmer":
+        base='home.html'
+    else:
+        base='shopbase.html'
     orders = Order.objects.select_related('user').filter(user=users)
-    return render(request, "shop/orders.html", {"orders": orders})
+    return render(request, "shop/orders.html", {"orders": orders,'base':base})
 from datetime import datetime, timedelta
 # Payment Processing (Dummy)
 def payment_page(request):
@@ -492,7 +557,7 @@ def payment_page(request):
 # Add 7 days
     future_date = current_date + timedelta(days=7)
     print("payment")
-    user =get_object_or_404(Farm_table,id=request.session.get('didno'))
+    user =get_object_or_404(shop,id=request.session.get('didno'))
 
     # Get the latest order for the user (assuming one order at a time)
     order = Order.objects.filter(user=user, status="Pending").last()
@@ -523,7 +588,7 @@ def payment_page(request):
         delivery=Delivery.objects.create(
             order=order,
             delivery_address=request.POST.get("address"),
-            estimated_time =future_date + "10:00"
+            estimated_time =future_date
 
         )   
         delivery.save()
@@ -535,3 +600,14 @@ def payment_page(request):
 def payment_view(request):
     messages.success(request, "Payment successful! Your order is being processed.")
     return redirect("order_list")
+
+def report_detail(req):
+    user=get_object_or_404(shop,id=req.session.get('didno'))
+    report=Payment.objects.select_related('user','order').order_by('-id').filter(user=user)
+    return render(req,'report_detail.html',{'reports':report})
+
+def logout(req):
+    req.session['didno']=""
+    req.session['shopid']=""
+    req.session['role']=""
+    return redirect("/")

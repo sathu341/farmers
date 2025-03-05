@@ -1,4 +1,4 @@
-{% extends 'home.html' %}
+{% extends base %}
 {% load static %}
 {% block title %}
 Product List 
@@ -23,28 +23,42 @@ Product List
     border:2px solid lightgrey;
     padding:20px;
     
+    
 }
 .product .items img{
   width:100%;
   height: 150px;
 }
+.product-text{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap:10px;
+  padding:20px;
+  height: 200px;
+  overflow: hidden;
+}
 </style>
 <br/>
 <br/>
-<div class="container-fluid mt-4">
-  <div class="row">
+<div class="container-fluid mt-2">
+  <div class="row mb-3">
     <h1 class="text-center"> Our Products</h1>
   </div>
   <div class="product">
     {% for product in products %}
     <div class="items" style="border:1px solid lightgray;">
       
-      <img  src="{{ product.image.url }}" style="width:100%;height150px;"/>
-        <h3>{{ product.pname }}</h3>
-     
-        <p>Price: &#8377; {{ product.price }}</p>
-        <a href="/product_byid/{{product.id}}">More Detail</a>
+      <img  src="{{ product.image.url }}" style="width:100%;height:150px;"/>
+      <div class="product-text">
+        <strong> Name:{{ product.pname }}</strong>
+        <strong>Price: &#8377; {{ product.price }}</strong>
+        
+      </div>
+        
         <hr> 
+        <a class="btn btn-primary p-3" href="/product_byid/{{product.id}}">More Detail</a>
     
 
     </div>
